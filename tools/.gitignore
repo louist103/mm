@@ -1,8 +1,11 @@
 # Output files
-!ido_recomp/**
-*.exe
 yaz0
+yaz0.exe
 makeromfs
+makeromfs.exe
 elf2rom
+elf2rom.exe
 mkldscript
+mkldscript.exe
 vtxdis
+vtxdis.exe
