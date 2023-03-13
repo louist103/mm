@@ -188,6 +188,9 @@ O_FILES       := $(foreach f,$(S_FILES:.s=.o),build/$f) \
                  $(foreach f,$(C_FILES:.c=.o),build/$f) \
                  $(foreach f,$(BASEROM_FILES),build/$f.o)
 
+ASM_PROC_FILES_C := $(shell grep -rHl -m 1 -e src/* -e "GLOBAL_ASM" -e "Printf")
+ASM_PROC_FILES_O := $(foreach f,$(ASM_PROC_FILES_C:.c=.o),build/$f)
+
 OVL_RELOC_FILES := $(shell $(CPP) $(CPPFLAGS) $(SPEC) | grep -o '[^"]*_reloc.o' )
 
 # Automatic dependency files
@@ -230,19 +233,21 @@ build/src/libultra/libc/llcvt.o: OPTFLAGS := -O1
 build/src/libultra/libc/llcvt.o: MIPS_VERSION := -mips3 -32
 
 # cc & asm-processor
-build/src/boot_O2/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
-build/src/boot_O2_g3/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+build/src/boot_O2/%.o: CC := $(CC)
+build/src/boot_O2_g3/%.o: CC := $(CC)
 
 build/src/libultra/%.o: CC := $(CC_OLD)
 # Needed at least until voice is decompiled
-build/src/libultra/voice/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC_OLD) -- $(AS) $(ASFLAGS) --
+build/src/libultra/voice/%.o: CC := $(CC_OLD)
 
-build/src/code/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
-build/src/audio/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+build/src/code/%.o: CC := $(CC)
+build/src/audio/%.o: CC := $(CC)
 
-build/src/overlays/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+build/src/overlays/%.o: CC := $(CC)
 
 build/assets/%.o: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
+
+ASM_PROC_FILES_O: CC := $(ASM_PROC) $(ASM_PROC_FLAGS) $(CC) -- $(AS) $(ASFLAGS) --
 
 #### Main Targets ###
 
@@ -324,6 +329,9 @@ init:
 	$(MAKE) disasm
 	$(MAKE) all
 	$(MAKE) diff-init
+
+print:
+	@echo $(ASM_PROC_FILES_O)
 
 #### Various Recipes ####
 
